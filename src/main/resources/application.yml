@@ -1,0 +1,6 @@
+spring:
+  profiles:
+    group:
+      test: web-test, rdb-test, cache-test
+      local: web-local, rdb-local, cache-local
+    active: local
