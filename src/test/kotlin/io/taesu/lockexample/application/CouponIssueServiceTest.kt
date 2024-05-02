@@ -42,7 +42,7 @@ class CouponIssueServiceTest: AbstractRdbTest() {
         // when
         (1..10000L).forEach {
             executors.submit {
-                couponIssueService.issueWithNoLock(it, couponKey)
+                couponIssueService.issue(it, couponKey)
                 latch.countDown()
             }
         }

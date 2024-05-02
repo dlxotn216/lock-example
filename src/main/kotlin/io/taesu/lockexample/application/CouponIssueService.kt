@@ -1,5 +1,6 @@
 package io.taesu.lockexample.application
 
+import io.taesu.lockexample.aop.lock.AcquireDistributeLock
 import io.taesu.lockexample.domain.CouponRepository
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -17,7 +18,7 @@ class CouponIssueService(
     private val couponRepository: CouponRepository
 ) {
     @Transactional
-    fun issueWithNoLock(userKey: Long, couponKey: Long) {
+    fun issue(userKey: Long, couponKey: Long) {
         val coupon = couponRepository.getReferenceById(couponKey)
         coupon.issue(userKey)
         couponRepository.save(coupon)
@@ -43,5 +44,15 @@ class CouponIssueService(
 
     companion object {
         val log = LoggerFactory.getLogger(this::class.java)
+    }
+}
+
+@Service
+class CouponIssueLockedService(
+    private val couponIssueService: CouponIssueService
+) {
+    @AcquireDistributeLock(key = "'lock:coupon:' + #couponKey")
+    fun issueWithDistributedLock(userKey: Long, couponKey: Long) {
+        couponIssueService.issue(userKey, couponKey)
     }
 }
