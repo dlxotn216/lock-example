@@ -50,7 +50,7 @@ class CouponIssueServiceTest: AbstractRdbTest() {
         latch.await()
 
 
-        // then
+        // then (아래 검증은 때에 따라 실패할 수도 있음)
         assertThat(couponUserRepository.countByCoupon_CouponKey(couponKey)).isNotEqualTo(100L)
         assertThat(couponRepository.getReferenceById(couponKey).remainedStock).isNotEqualTo(0L)
     }

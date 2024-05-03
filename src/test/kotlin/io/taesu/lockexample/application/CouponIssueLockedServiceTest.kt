@@ -5,6 +5,7 @@ import io.taesu.lockexample.domain.CouponRepository
 import io.taesu.lockexample.domain.CouponUserRepository
 import io.taesu.lockexample.helper.AbstractRdbTest
 import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -51,7 +52,7 @@ class CouponIssueLockedServiceTest: AbstractRdbTest() {
 
 
         // then
-        Assertions.assertThat(couponUserRepository.countByCoupon_CouponKey(couponKey)).isEqualTo(100)
-        Assertions.assertThat(couponRepository.getReferenceById(couponKey).remainedStock).isEqualTo(0L)
+        assertThat(couponUserRepository.countByCoupon_CouponKey(couponKey)).isEqualTo(100)
+        assertThat(couponRepository.getReferenceById(couponKey).remainedStock).isEqualTo(0L)
     }
 }

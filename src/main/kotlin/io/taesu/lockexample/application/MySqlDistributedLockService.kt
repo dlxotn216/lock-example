@@ -3,13 +3,9 @@ package io.taesu.lockexample.application
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Service
 import java.sql.Connection
-import java.time.Duration
-import java.util.concurrent.Executors
-import java.util.concurrent.Future
-import java.util.concurrent.TimeUnit
-import java.util.concurrent.TimeoutException
 import javax.sql.DataSource
 
 
@@ -20,6 +16,11 @@ import javax.sql.DataSource
  * @version lock-example
  * @since lock-example
  */
+@ConditionalOnProperty(
+    value = ["app.lock"],
+    havingValue = "mysql",
+    matchIfMissing = false
+)
 @Service
 class MySqlDistributedLockService(
     @Qualifier("distributedLockDataSource") private val dataSource: DataSource
