@@ -3,7 +3,9 @@ package io.taesu.lockexample.application
 import io.taesu.lockexample.domain.VersionedUserProfile
 import io.taesu.lockexample.domain.VersionedUserProfileRepository
 import io.taesu.lockexample.helper.AbstractRdbTest
+import jakarta.persistence.RollbackException
 import jakarta.persistence.TransactionRequiredException
+import org.assertj.core.api.Assertions.anyOf
 import org.assertj.core.api.Assertions.assertThat
 import org.hibernate.exception.GenericJDBCException
 import org.junit.jupiter.api.Test
@@ -14,6 +16,7 @@ import org.springframework.dao.InvalidDataAccessApiUsageException
 import org.springframework.orm.ObjectOptimisticLockingFailureException
 import org.springframework.orm.jpa.JpaSystemException
 import org.springframework.test.context.ActiveProfiles
+import org.springframework.transaction.TransactionSystemException
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CompletionException
 import java.util.concurrent.Executors
@@ -88,7 +91,7 @@ class VersionedUserProfileServiceTest: AbstractRdbTest() {
         userProfileService.update(user.userKey, VersionedUserUpdateCommand("change name", "hello", user.version))
         Thread.sleep(500L)  // 앞선 트랜잭션 커밋 후 사용자가 다른 세션에서 업데이트 시도 하는 시나리오
 
-        val exception = assertThrows<ObjectOptimisticLockingFailureException> {
+        val exception = assertThrows<Exception> {
             userProfileService.update(
                 user.userKey,
                 VersionedUserUpdateCommand("taesu", "change introduce", user.version)
@@ -96,7 +99,12 @@ class VersionedUserProfileServiceTest: AbstractRdbTest() {
         }
 
         // then
-        assertThat(exception).isInstanceOf(ObjectOptimisticLockingFailureException::class.java)
+        // assertThat(exception).isInstanceOf(ObjectOptimisticLockingFailureException::class.java)
+
+        // Entity lifecycle에서 검증하는 경우
+        assertThat(exception).isInstanceOf(TransactionSystemException::class.java)
+        assertThat(exception.cause).isInstanceOf(RollbackException::class.java)
+        assertThat(exception.cause!!.cause).isInstanceOf(ObjectOptimisticLockingFailureException::class.java)
     }
 
     @Test

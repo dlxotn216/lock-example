@@ -1,8 +1,8 @@
 package io.taesu.lockexample.domain
 
 import jakarta.persistence.*
-import jakarta.persistence.Table
-import org.hibernate.annotations.*
+import org.hibernate.annotations.DynamicUpdate
+import org.hibernate.annotations.NaturalId
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Lock
 import org.springframework.orm.ObjectOptimisticLockingFailureException
@@ -62,20 +62,54 @@ class VersionedUserProfile(
     @Column(name = "introduce", nullable = true, length = 4000)
     var introduce: String?,
 
-    @Version
-    val version: Long = 0L,
-) {
+    version: Long = 0L,
+): AbstractVersionedEntity(version) {
+    override fun getId(): Long = userKey
+
+    // fun update(name: String, introduce: String?, version: Long) {
+    //     if (this.version != version) {
+    //         throw ObjectOptimisticLockingFailureException(
+    //             this::class.java,
+    //             "[key:${this.userKey}][${this.version}:$version] Version mismatch"
+    //         )
+    //     }
+    //     // this.version = version 설정 해줘도 where version에 바인딩 되는 것은 조회된 엔티티의 version 값이다.
+    //     // 따라서 요청의 version mismatch 여부는 직접 확인해야 한다.
+    //     this.name = name
+    //     this.introduce = introduce
+    // }
+
     fun update(name: String, introduce: String?, version: Long) {
-        if (this.version != version) {
-            throw ObjectOptimisticLockingFailureException(
-                this::class.java,
-                "[key:${this.userKey}][${this.version}:$version] Version mismatch"
-            )
-        }
-        // this.version = version 설정 해줘도 where version에 바인딩 되는 것은 조회된 엔티티의 version 값이다.
-        // 따라서 요청의 version mismatch 여부는 직접 확인해야 한다.
         this.name = name
         this.introduce = introduce
+        this.version = version
+        // 혹은 Entity lifecycle에서 검증
+    }
+}
+
+@MappedSuperclass
+abstract class AbstractVersionedEntity(
+    @Version
+    var version: Long = 0L
+) {
+    abstract fun getId(): Long
+
+    @Transient
+    var previousVersion: Long = 0L
+
+    @PostLoad
+    fun afterLoad() {
+        this.previousVersion = this.version
+    }
+
+    @PreUpdate
+    fun beforeUpdate() {
+        if(this.version != this.previousVersion) {
+            throw ObjectOptimisticLockingFailureException(
+                this::class.java,
+                "[key:${this.getId()}][${this.version}:${this.previousVersion}] Version mismatch"
+            )
+        }
     }
 }
 
