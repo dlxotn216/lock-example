@@ -38,7 +38,7 @@ class VersionedUserProfileServiceTest: AbstractRdbTest() {
     private lateinit var userProfileService: VersionedUserProfileService
 
     @Test
-    fun `변경 데이터가 소실되지 않도록 ObjectOptimisticLockingFailureException이 발생한다`() {
+    fun `동시성 환경에서 OptimisticLockingFailureException이 발생한다`() {
         // given
         val user = userProfileRepository.save(
             VersionedUserProfile(
@@ -77,7 +77,7 @@ class VersionedUserProfileServiceTest: AbstractRdbTest() {
     }
 
     @Test
-    fun `ObjectOptimisticLockingFailureException이 발생한다`() {
+    fun `Long Conversation 환경에서 OptimisticLockingFailureException이 발생한다`() {
         // given
         val user = userProfileRepository.save(
             VersionedUserProfile(
