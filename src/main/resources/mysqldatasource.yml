@@ -28,7 +28,6 @@ spring:
       hibernate.dialect.storage_engine: innodb
       hibernate.jdbc.fetch_size: ${spring.jdbc.template.fetch-size}
       hibernate.create_empty_composites.enabled: true
-    open-in-view: false
 distributedlock:
   datasource:
     hikari:
