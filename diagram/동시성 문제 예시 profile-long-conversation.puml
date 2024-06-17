@@ -1,0 +1,26 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+autonumber
+actor  Client1 as Client1
+participant  API as API
+actor  Client2 as Client2
+
+Client1 -> API : 사용자 정보 조회
+API -> Client1 : 사용자 정보 응답 \n{name: "이태수", intro: "Hello", v:1}
+
+Client2 -> API : 사용자 정보 조회
+API -> Client2 : 사용자 정보 응답 \n{name: "이태수", intro: "Hello", v:1}
+
+group Name 변경 (이태수 -> Taesu Lee)
+    Client1 -> API : 사용자 정보 업데이트 요청 \n{name: "Taesu Lee", intro: "Hello", v:1}
+    API -> Client1 : 사용자 정보 업데이트 응답 \n{name: "Taesu Lee", intro: "Hello", v:2}
+end
+
+group Intro 변경 (Hello -> 안녕하세요)
+    Client2 -> API : 사용자 정보 업데이트 요청 \n{name: "이태수", intro: "안녕하세요", v:1}
+    API -> API: 사용자 정보 조회 (v:2)\nupdate ... <font color="red">where v=2</font>
+    API -> Client2 : 사용자 정보 업데이트 응답 \n<font color="red">{name: "이태수", intro: "안녕하세요", v:3}</font>
+end
+
+@enduml

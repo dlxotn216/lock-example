@@ -1,0 +1,17 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+autonumber
+participant  Client as Client
+actor  TX1 as TX1
+actor  TX2 as TX2
+database  DB as DB
+
+Client -> TX1 : 쿠폰 발급 요청
+TX1 -> DB : 쿠폰 발급 정보 조회 \n(stock: 100)
+Client -> TX2 : 쿠폰 발급 요청
+TX2 -> DB : 쿠폰 발급 정보 조회 \n(stock: 100)
+TX1 -> DB: 쿠폰 재고감소 \n(stock: 99)
+TX2 -> DB : 쿠폰 재고감소 \n(stock: 99)
+
+@enduml

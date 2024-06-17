@@ -1,0 +1,21 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+autonumber
+participant  Client as Client
+actor  TX1 as TX1
+actor  TX2 as TX2
+database  DB as DB
+
+Client -> TX1 : 사용자 정보 업데이트 요청 \n{name: Taesu Lee, intro: "안녕하세요"}
+TX1 -> DB : 사용자 정보 조회
+DB -> TX1 : {name: "이태수", intro: "안녕하세요"}
+
+Client -> TX2 : 사용자 정보 업데이트 요청 \n{name: "이태수", intro: "Hello"}
+TX2 -> DB : 사용자 정보 조회
+DB -> TX2 : {name: 이태수, intro: "안녕하세요"}
+
+TX1 -> DB : update user set name = "Taesu Lee" where key = 1
+TX2 -> DB : update user set intro = "Hello" where key = 1
+
+@enduml
